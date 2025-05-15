@@ -10,17 +10,7 @@ import os
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 from functools import partial
-
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-    tf.config.set_visible_devices([], 'GPU')
-    # (opcional) evita cualquier reserva previa de memoria
-    for gpu in gpus:
-        try:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        except Exception:
-            pass
-
+from importlib import resources
 import numpy as np
 
 # work close
@@ -44,8 +34,11 @@ def obtener_argumentos():
 
 def ejecutar():
 
-    route_models: str = "mi_herramienta/models/"
     default_model: str = "model_cnn.keras"
+    model_path = (
+        resources.files("mi_herramienta")  # carpeta site-packages/mi_herramienta
+                 .joinpath("models", default_model)
+    )
     default_value_k: int = 7
     default_encoding: str = "latin-1"
     seleccionados : List[str] = ['exon', 'intron', 'transposable_element_gene', 'intergenic_region']
@@ -135,7 +128,7 @@ def ejecutar():
 
     # Seleccionar el modelo adecuado.
     
-    model = tf.keras.models.load_model(route_models+default_model)
+    model = tf.keras.models.load_model(model_path)
     resultado = model.predict(X_data, batch_size = 1)
 
     mse = tf.keras.losses.MeanSquaredError()(y_data, resultado).numpy()
