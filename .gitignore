@@ -1,3 +1,7 @@
 # Carpetas innecesarias
 xdd/
 build/
+
+# Archivos innecesarios
+.DS_Store
+mi_herramienta/.DS_Store
