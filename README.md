@@ -46,6 +46,19 @@ Desde la carpeta raíz del proyecto, ejecuta:
 source AsCNN/bin/activate
 ```
 
+### 1.3 Entorno de conda
+
+Desde la terminal ejecuta:
+
+```bash
+conda create -n katulu \
+  agat=1.2.0 \
+  perl-clone \
+  perl-list-moreutils \
+  perl-sort-naturally \
+  perl-try-tiny
+```
+
 ## 2. Acceder al proyecto y realizar la instalación
 
 Desde la terminal, navega hasta la carpeta donde se encuentra este proyecto (si no estás ya en ella) e instala el paquete ejecutando:

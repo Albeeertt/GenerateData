@@ -7,11 +7,18 @@ from pandas import DataFrame
 # work open 
 import argparse
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+import subprocess
 import tensorflow as tf
 from functools import partial
 from importlib import resources
 import numpy as np
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 # work close
 from mi_herramienta.core.CleanData import CleanData
@@ -19,6 +26,7 @@ from mi_herramienta.core.CreateTables import CreateTables
 from mi_herramienta.utils.scheduler import Scheduler
 from mi_herramienta.utils.wrapper import Wrapper
 from mi_herramienta.utils.split import split_into_chunks, split_list_into_tables
+from mi_herramienta.utils.agat import Agat
 
 def obtener_argumentos():
     parser = argparse.ArgumentParser()
@@ -26,26 +34,39 @@ def obtener_argumentos():
     parser.add_argument('--gff', type=str, required=True, help="Ruta hasta el archivo GFF.")
     parser.add_argument('--fasta', type=str, required=True, help="Ruta hasta el archivo fasta.")
     # parser.add_argument('--k', type=int, required=False, help="Tamaño del kmer.")
+    parser.add_argument('--repeatMask', type=str, required=False, help="Mask of transposable elements in gff3.")
+    parser.add_argument('--add_labels', type=bool, required=False, help="Add introns, intergenic regions and keep the longest isoform")
     parser.add_argument('--n_cpus', type=int, required=True, help="Número de cpus a usar")
     
     # Analizar los argumentos pasados por el usuario
     return parser.parse_args()
 
 
-def ejecutar():
 
-    default_model: str = "model_cnn.keras"
+def ejecutar():
+    args = obtener_argumentos()
+
+    if args.add_labels:
+        route_out: str = ("/".join(args.gff.split("/")[:-1]))+"/"
+        instance_agat = Agat("katulu")
+        new_route_gff = instance_agat.add_introns(args.gff, route_out)
+        new_route_gff = instance_agat.add_intergenicRegion(new_route_gff, route_out)
+        args.gff = instance_agat.keep_longest_isoform(new_route_gff, route_out)
+
+
+
+
+    default_model: str = "one_more_time_1900.keras"
     model_path = (
-        resources.files("mi_herramienta")  # carpeta site-packages/mi_herramienta
+        resources.files("mi_herramienta")  
                  .joinpath("models", default_model)
     )
     default_value_k: int = 7
     default_encoding: str = "latin-1"
-    seleccionados : List[str] = ['exon', 'intron', 'transposable_element_gene', 'intergenic_region']
-    translate_type_idx : Dict[str, int] = {'exon': 0, 'intron': 1, 'transposable_element_gene': 2, 'intergenic_region': 3}
+    seleccionados : List[str] = ['exon', 'intron', 'transposable_element', 'intergenic_region']
+    translate_type_idx : Dict[str, int] = {'exon': 0, 'intron': 1, 'transposable_element': 2, 'intergenic_region': 3}
     DEFAULT_LIMITE: int = 800
 
-    args = obtener_argumentos()
     route_gff: str = args.gff
     route_fasta: str = args.fasta
     value_k: int = default_value_k
@@ -83,7 +104,11 @@ def ejecutar():
     )
 
     scheduler_cleanData = Scheduler([select_adapter, extract_adapter, remove_sample_contaminated_adapter], split_into_chunks)
-    results_clean_data = scheduler_cleanData.run(cleanData_instance.obtain_dicc_fasta(route_fasta), cleanData_instance.obtain_dicc_bed(route_gff, encoding=encoding_gff), n_cpu)
+    fasta = cleanData_instance.obtain_dicc_fasta(route_fasta)
+    bed = cleanData_instance.obtain_dicc_bed(route_gff, encoding=encoding_gff)
+    if args.repeatMask:
+        bed = cleanData_instance.add_transposable_element(bed, args.repeatMask)
+    results_clean_data = scheduler_cleanData.run(fasta, bed, n_cpu)
 
 # ---------
 

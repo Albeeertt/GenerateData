@@ -14,7 +14,7 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'alb=mi_herramienta.cli:main',
+            'katulu=mi_herramienta.cli:main',
         ],
     },
 )

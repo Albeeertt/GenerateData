@@ -3,6 +3,7 @@ import os
 import numpy as np
 import logging
 from Bio import SeqIO
+import pyranges as pr
 
 from typing import Dict, List
 from pandas import DataFrame
@@ -12,7 +13,6 @@ class CleanData:
 
     def __init__(self):
         self._logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
         self.dataset: List[Dict] = []
 
 
@@ -31,6 +31,29 @@ class CleanData:
             for record in SeqIO.parse(file, "fasta"):
                 all_fasta[record.id] = str(record.seq).upper()
         return all_fasta
+    
+
+    def add_transposable_element(self, gff_complete: Dict[int, DataFrame], route_gff_te: str):
+        gff_complete[1].columns = ['Chromosome','db','type','Start','End','score','strand','phase','attributes']
+        gr_ann = pr.PyRanges(gff_complete[1])
+        data_te = pd.read_csv(route_gff_te, comment='#', sep='\t', header=None, encoding= 'latin-1')
+        data_te.columns = ['Chromosome','db','type','Start','End','score','strand','phase','attributes']
+        data_te['type'] = "transposable_element"
+        gr_TEs = pr.PyRanges(data_te)
+
+        # Restar los TEs de las anotaciones (PyRanges trocea automáticamente los intervalos)
+        gr_ann_minus_TE = gr_ann.subtract(gr_TEs)
+        print("Antes: ", gff_complete[1].shape)
+        print("Después: ", (gr_ann_minus_TE.df).shape)
+
+        # Combinar las anotaciones troceadas con los TEs y ordenar por coordenadas
+        gr_merged = pr.concat([gr_ann_minus_TE, gr_TEs]).sort()
+        dataset = gr_merged.df
+        print("Añado: ", (gr_TEs.df).shape)
+        print("Final: ", dataset.shape)
+        dataset.columns = ['chr','db','type','start','end','score','strand','phase','attributes']
+        gff_complete[1] = dataset
+        return gff_complete
     
 
     def types_type(self, dicc_bed: Dict[int, DataFrame]):
