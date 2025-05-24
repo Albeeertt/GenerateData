@@ -41,6 +41,12 @@ class CleanData:
         data_te['type'] = "transposable_element"
         gr_TEs = pr.PyRanges(data_te)
 
+        mask = ~data_te['Chromosome'].isin(gff_complete[1]['Chromosome'])
+        lista_no_en_gff_complete = np.unique(data_te.loc[mask, 'Chromosome'].tolist())
+        self._logger.info("Chr de maskedRepeat que no están en el gff pasado: ")
+        self._logger.info(lista_no_en_gff_complete)
+
+
         # Restar los TEs de las anotaciones (PyRanges trocea automáticamente los intervalos)
         gr_ann_minus_TE = gr_ann.subtract(gr_TEs)
         print("Antes: ", gff_complete[1].shape)
