@@ -1,54 +1,48 @@
 # Proyecto AsCNN
 
-¿Qué es AsCNN y por qué te combiene usarlo con tus especies anotadas? En muchas ocasiones nos hemos preguntado si las anotaciones que poseemos para cierta especie están ciertamente bien anotadas; y es que para ellos hemos diseñado AsCNN. AsCNN mediante la captura de patrones a partir de redes convolucionales intenta predecir cómo de bien se ha realizado la anotación.
+What is AsCNN and why should you use it with your annotated species?
 
-La siguiente pregunta que te harás es, ¿de qué manera se ha diseñado para que encuentre estos patrones? Muy fácil, mediante el uso de k-mers y la anotación a evaluar, se han generado múltiples tablas con las frecuencias de cada clase a analizar (exón, intrón, región intergénica y genes pertenecientes a elementos transponibles). Estas tablas se han generado para el entrenamiento de nuestro modelo con especies que están anotadas de manera correcta, como consecuencia, nuestro modelo ha aprendido los patrones que deben de seguir estas tablas que modelizan distribuciones de probabilidad permitiéndonos realizar una predicción sobre cómo debe de ser la distribución y compararlas con las distribución a evaluar.
-    
-¿De qué constan estas tablas? Por un lado, poseemos cuatro columnas las cuales representan las cuatro posibles clases que tenemos en cuenta (exón, intrón, región intergénica y genes pertenecientes a elementos transponibles); y por otro lado, tenemos **4^k** filas, siendo k el tamaño del k-mer. En nuestro caso, el uso de k se ve limitado a valores entre 7 y 10, aunque se recomienda el uso de un valor igual a 7. Estas tablas poseen para cada k-mer la probabilidad de que sea una de las cuatro clases ya mencionadas, y para un genoma dado, se generan múltiples tablas (el número es dependiente del tamaño del genoma).
+Often, we’ve wondered whether the annotations we have for a given species are truly correct—and that’s exactly why we designed AsCNN. By capturing patterns through convolutional neural networks, AsCNN attempts to predict how well an annotation has been performed.
 
-¿Por qué múltiples tablas? Es necesario que el modelo no vea la distribución final, ya que el objetivo es que aprenda los patrones de las distribuciones de probabilidad, es por ello que no se genera una única tabla. Además, el uso de múltiples tablas nos permite dar un resultado más seguro de cómo de bien está anotado el genoma.
+The next question you might ask is: how was it designed to find these patterns? It’s simple: using k-mers and the annotation to be evaluated, we generate multiple tables of class frequencies to analyze (exon, intron, intergenic region, and transposable elements). These tables are produced using correctly annotated species for model training; as a result, our model has learned the patterns these probability‐distribution tables should follow, allowing us to predict the expected distribution and compare it against the one under evaluation.
 
-¿Qué predice nuestro modelo? Nuestro modelo predice para cada tabla introducida, una nueva tabla con las mismas dimensiones y en cada celda de esta tabla, la probabilidad final predicha para ese k-mer y esa clase en concreto. 
+What do these tables consist of? On the one hand, we have four columns representing the four classes we consider (exon, intron, intergenic region, and transposable elements); on the other hand, we have 4ᵏ rows, where k is the k-mer size. In our case, k is limited to values between 7 and 10, although a value of 7 is recommended. For each k-mer, these tables contain the probability of belonging to each of the four classes, and for a given genome, we generate multiple tables (the number depends on genome size).
 
-¿Cómo podemos saber si nuestra anotación está bien o mal? Cómo podemos observar, nuestro programa nos indica la Divergencia de Kullback Leibler entre las dos distribuciones obtenidas; cuando este valor oscila entre 0.17 y 0.2 podemos intuir que la anotación no es buena y con valores menores a 0.13 indican un buen resultado en la anotación. 
+Why multiple tables? It’s important that the model not see the overall, aggregated distribution, since our goal is for it to learn the distribution‐pattern features. Hence we don’t create just one table. Moreover, generating multiple tables gives us a more reliable assessment of annotation quality.
 
-¿Cuáles son los k-mers peor anotados? Nuestro programa AsCNN calcula para cada k-mer la Divergencia de Kullback Leibler entre las dos distribuciones, si esta supera el umbral 0.13, este k-mer es escrito en un archivo denominado **row_w_high_KLDivergence** el cual es posible consultal al final de la ejecución del programa.
+What does our model predict? For each input table, our model outputs a new table of identical dimensions; each cell in this output table contains the model’s final predicted probability for that specific k-mer and class.
 
-Este proyecto requiere un entorno virtual de Python para gestionar las dependencias de forma aislada. A continuación, se detallan los pasos para crear y activar el entorno en distintos sistemas operativos, y cómo instalar el paquete localmente.
+How can we tell whether an annotation is good or bad? Our program reports the Kullback–Leibler divergence between the two distributions. Values between 0.30 and 0.50 suggest poor annotation quality, while values below 0.25 indicate a good annotation.
 
-## Requisitos previos
+Which k-mers are the worst annotated? AsCNN computes the Kullback–Leibler divergence for each k-mer between the two distributions; if this exceeds the 0.13 threshold, that k-mer is written to a file named **row_w_high_KLDivergence**, which you can review at the end of the program’s execution.
 
-- Python 3.10 o superior
-- `pip` (viene incluido con Python 3)
-- Acceso a la terminal o línea de comandos
+This project requires a Python virtual environment to manage dependencies in isolation. Below are the steps to create and activate the environment on different operating systems, and to install the package locally.
 
-## 1. Crear un entorno virtual
+## Prerequisites
 
-Desde la carpeta raíz del proyecto, ejecuta:
+- Python 3.10 or higher
+- `pip` (included with Python 3)
+- Access to the terminal or command line
+
+## 1. Create a virtual environment
+
+From the project root folder, run:
 
 ```bash
 python -m venv AsCNN
 ```
 
-### 1.1 Activa el entorno virtual en Windows
+### 1.1 Activate the virtual environment on Windows
 
-Desde la carpeta raíz del proyecto, ejecuta:
+From the project root folder, run:
 
 ```bash
 AsCNN\Scripts\activate
 ```
 
-### 1.2 Activa el entorno virtual en macOS y Linux
+### 1.2 Conda environment
 
-Desde la carpeta raíz del proyecto, ejecuta:
-
-```bash
-source AsCNN/bin/activate
-```
-
-### 1.3 Entorno de conda
-
-Desde la terminal ejecuta:
+Before installing the tool, you need to create another environment, this time with conda; so, from the terminal run:
 
 ```bash
 conda create -n katulu \
@@ -59,28 +53,36 @@ conda create -n katulu \
   perl-try-tiny
 ```
 
-## 2. Acceder al proyecto y realizar la instalación
+### 1.3 Activate the virtual environment on macOS and Linux
 
-Desde la terminal, navega hasta la carpeta donde se encuentra este proyecto (si no estás ya en ella) e instala el paquete ejecutando:
+From the project root folder, run:
+
+```bash
+source AsCNN/bin/activate
+```
+
+
+## 2. Access the project and install
+
+From the terminal, navigate to the folder where this project is located (if you’re not already there) and install the package by running:
 
 ```bash
 pip install .
 ```
 
-## 3. Ejecutar el programa
+## 3. Run the program
 
-Una vez instalado el paquete y con el entorno activado, puedes ejecutar el programa principal pasando tres argumentos:
+Once the package is installed and the environment is activated, you can run the main program by passing the following arguments:
 
-- **--gff**: Ruta al archivo GFF.
-- **--fasta**: Ruta al archivo fasta.
-- **--n_cpus**: Número de cpus a usar.
+- **--gff**: Path to the GFF file.  
+- **--fasta**: Path to the FASTA file.  
+- **--n_cpus**: Number of CPUs to use.  
+- **--repeatMask**: GFF3 file that enables annotation of transposable elements.  
+- **--add_labels**: Adds introns, intergenic regions, and transposable elements using AGAT.  
 
-## 4. Ejemplo
 
-alb --gff ./data/data_bed/Welwitschia_mirabilis/Welwitschia_mirabilis.gff3 --fasta ./data/data_fasta/Welwitschia_mirabilis/Welwitschia_mirabilis.fasta --n\_cpus 12
+## Calculated metrics
 
-## Métricas calculadas
-
- - Accuracy: El cálculo de accuracy se realiza para cada fila se obtiene la probabilidad más alta (ejemplo: - columna 2 - intrón - con probabilidad 0.8 -) y se comprueba en la anotación a evaluar, en la tabla con las distribuciones finales, si esa fila posee la máxima probabilidad en la columna 2. 
- - Divergencia de Kullback Leibler: mide cuanta información pierdes al aproximar una distribución de probabilidad _P_ por otra _Q_.
+- **Accuracy**: For each row, the highest probability is selected (e.g., column 2 – intron – with probability 0.8) and then checked against the evaluated annotation in the final distribution table to see if that row has the maximum probability in column 2.
+- **Kullback–Leibler divergence**: Measures how much information is lost when approximating a probability distribution _P_ by another distribution _Q_.
 
