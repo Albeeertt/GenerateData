@@ -56,7 +56,7 @@ def ejecutar():
 
 
 
-    default_model: str = "one_more_time_1900.keras"
+    default_model: str = "end_800.keras"
     model_path = (
         resources.files("mi_herramienta")  
                  .joinpath("models", default_model)

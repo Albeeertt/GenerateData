@@ -32,15 +32,7 @@ From the project root folder, run:
 python -m venv AsCNN
 ```
 
-### 1.1 Activate the virtual environment on Windows
-
-From the project root folder, run:
-
-```bash
-AsCNN\Scripts\activate
-```
-
-### 1.2 Conda environment
+### 1.1 Conda environment
 
 Before installing the tool, you need to create another environment, this time with conda; so, from the terminal run:
 
@@ -51,6 +43,14 @@ conda create -n katulu \
   perl-list-moreutils \
   perl-sort-naturally \
   perl-try-tiny
+```
+
+### 1.2 Activate the virtual environment on Windows
+
+From the project root folder, run:
+
+```bash
+AsCNN\Scripts\activate
 ```
 
 ### 1.3 Activate the virtual environment on macOS and Linux
