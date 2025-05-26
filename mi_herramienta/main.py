@@ -37,6 +37,7 @@ def obtener_argumentos():
     parser.add_argument('--repeatMask', type=str, required=False, help="Mask of transposable elements in gff3.")
     parser.add_argument('--add_labels', type=bool, required=False, help="Add introns, intergenic regions and keep the longest isoform")
     parser.add_argument('--n_cpus', type=int, required=True, help="Número de cpus a usar")
+    parser.add_argument('--out', type=str, required=True, help="Carpeta donde se va a alojar row_w_high_KLDivergence")
     
     # Analizar los argumentos pasados por el usuario
     return parser.parse_args()
@@ -191,10 +192,10 @@ def ejecutar():
 
 # ------------------------
 
-    umbral = 0.13
+    umbral = 0.25
     filas_altas = []
 
-    with open("row_w_high_KLDivergence", "w") as f:
+    with open(args.out+"/row_w_high_KLDivergence.txt", "a") as f:
         for i in range(y_data[tabla_elegida].shape[0]):
             kl_val = tf.keras.losses.KLDivergence()(y_data[tabla_elegida][i], resultado[tabla_elegida][i]).numpy()
             

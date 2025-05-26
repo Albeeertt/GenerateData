@@ -9,7 +9,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
       package_data={                    
-        "mi_herramienta": ["models/*.keras"],
+        "mi_herramienta": ["models/*.keras", "models/*.pt"],
     },
     install_requires=requirements,
     entry_points={
