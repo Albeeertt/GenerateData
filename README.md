@@ -1,8 +1,8 @@
-# Proyecto AsCNN
+# Project KMAsgec
 
-What is AsCNN and why should you use it with your annotated species?
+What is KMAsgec and why should you use it with your annotated species?
 
-Often, we’ve wondered whether the annotations we have for a given species are truly correct—and that’s exactly why we designed AsCNN. By capturing patterns through convolutional neural networks, AsCNN attempts to predict how well an annotation has been performed.
+Often, we’ve wondered whether the annotations we have for a given species are truly correct—and that’s exactly why we designed KMAsgec. By capturing patterns through convolutional neural networks, KMAsgec attempts to predict how well an annotation has been performed.
 
 The next question you might ask is: how was it designed to find these patterns? It’s simple: using k-mers and the annotation to be evaluated, we generate multiple tables of class frequencies to analyze (exon, intron, intergenic region, and transposable elements). These tables are produced using correctly annotated species for model training; as a result, our model has learned the patterns these probability‐distribution tables should follow, allowing us to predict the expected distribution and compare it against the one under evaluation.
 
@@ -14,7 +14,7 @@ What does our model predict? For each input table, our model outputs a new table
 
 How can we tell whether an annotation is good or bad? Our program reports the Kullback–Leibler divergence between the two distributions. Values between 0.30 and 0.50 suggest poor annotation quality, while values below 0.25 indicate a good annotation.
 
-Which k-mers are the worst annotated? AsCNN computes the Kullback–Leibler divergence for each k-mer between the two distributions; if this exceeds the 0.13 threshold, that k-mer is written to a file named **row_w_high_KLDivergence**, which you can review at the end of the program’s execution.
+Which k-mers are the worst annotated? KMAsgec computes the Kullback–Leibler divergence for each k-mer between the two distributions; if this exceeds the 0.13 threshold, that k-mer is written to a file named **row_w_high_KLDivergence**, which you can review at the end of the program’s execution.
 
 This project requires a Python virtual environment to manage dependencies in isolation. Below are the steps to create and activate the environment on different operating systems, and to install the package locally.
 
@@ -29,7 +29,7 @@ This project requires a Python virtual environment to manage dependencies in iso
 From the project root folder, run:
 
 ```bash
-python -m venv AsCNN
+python -m venv KMAsgec
 ```
 
 ### 1.1 Conda environment
@@ -50,7 +50,7 @@ conda create -n katulu \
 From the project root folder, run:
 
 ```bash
-AsCNN\Scripts\activate
+KMAsgec\Scripts\activate
 ```
 
 ### 1.3 Activate the virtual environment on macOS and Linux
@@ -58,7 +58,7 @@ AsCNN\Scripts\activate
 From the project root folder, run:
 
 ```bash
-source AsCNN/bin/activate
+source KMAsgec/bin/activate
 ```
 
 
@@ -79,6 +79,7 @@ Once the package is installed and the environment is activated, you can run the 
 - **--n_cpus**: Number of CPUs to use.  
 - **--repeatMask**: GFF3 file that enables annotation of transposable elements.  
 - **--add_labels**: Adds introns, intergenic regions, and transposable elements using AGAT.  
+- **--out**: Carpeta donde se va a alojar row_w_high_KLDivergence.
 
 
 ## Calculated metrics

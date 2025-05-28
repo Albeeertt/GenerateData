@@ -14,7 +14,7 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'katulu=mi_herramienta.cli:main',
+            'KMAsgec=mi_herramienta.cli:main',
         ],
     },
 )
