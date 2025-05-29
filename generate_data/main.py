@@ -14,6 +14,7 @@ from importlib import resources
 import numpy as np
 import logging
 from sklearn.model_selection import train_test_split
+import math
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,7 +58,7 @@ def obtener_argumentos():
     parser.add_argument('--fasta', type=str, required=True, help="Ruta hasta el archivo fasta.")
     # parser.add_argument('--k', type=int, required=False, help="Tamaño del kmer.")
     parser.add_argument('--repeatMask', type=str, required=False, help="Mask of transposable elements in gff3.")
-    parser.add_argument('--add_labels', type=bool, required=False, help="Add introns, intergenic regions and keep the longest isoform")
+    parser.add_argument('--add_labels', action='store_true', help="Add introns, intergenic regions and keep the longest isoform")
     parser.add_argument('--n_cpus', type=int, required=True, help="Número de cpus a usar")
     parser.add_argument('--out', type=str, required=True, help="Carpeta donde se va a alojar row_w_high_KLDivergence")
     
@@ -138,7 +139,7 @@ def ejecutar():
     # Aquí entran los cambios.
     # -------------------
     
-    LIMITES = [("20_porciento", .2*len(new_list)), ("45_porciento", .45*len(new_list)), ("70_porciento", .7*len(new_list)), ("90_porciento", .9*len(new_list))]
+    LIMITES = [("20_porciento", math.ceil(.2*len(new_list))), ("45_porciento", math.ceil(.45*len(new_list))), ("70_porciento", math.ceil(.7*len(new_list))), ("90_porciento", math.ceil(.9*len(new_list)))]
     filename_incomplete: str = "dataset_"
     extension_filename: str = ".json"
     train: str = "train_"
