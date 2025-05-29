@@ -141,7 +141,7 @@ def ejecutar():
     # Aquí entran los cambios.
     # -------------------
     
-    LIMITES = [("20_porciento", math.ceil(.2*len(new_list))), ("45_porciento", math.ceil(.45*len(new_list))), ("70_porciento", math.ceil(.7*len(new_list))), ("90_porciento", math.ceil(.9*len(new_list)))]
+    LIMITES = [("20_porciento", math.floor(.2*len(new_list))), ("40_porciento", math.floor(.4*len(new_list))), ("90_porciento", math.floor(.9*len(new_list)))]
     filename_incomplete: str = "dataset_"
     extension_filename: str = ".json"
     train: str = "train_"
@@ -183,14 +183,24 @@ def ejecutar():
         
         X_data = np.array(results_tables_x)
         X_data = np.expand_dims(X_data, axis=-1)
-
-        X_train, X_tmp, y_train, y_tmp = train_test_split(X_data, y_data, test_size=.4, random_state = random_state)
-        X_validation, X_test, y_validation, y_test = train_test_split(X_tmp, y_tmp, test_size=.2, random_state = random_state)
+        
+        if identifier == "20_porciento":
+            X_train, X_tmp, y_train, y_tmp = train_test_split(X_data, y_data, test_size=.4, random_state = random_state)
+            X_validation, X_test, y_validation, y_test = train_test_split(X_tmp, y_tmp, test_size=.2, random_state = random_state)
+        elif identifier == "40_porciento":
+            X_train, X_validation, y_train, y_validation = train_test_split(X_data, y_data, test_size=.2, random_state = random_state)
 
         # Dividir entre train, validantion y test
-        save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
-        save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
-        save_chunks_to_json(X_test, y_test, filename_incomplete+test+identifier+extension_filename)
+        if identifier == "90_porciento":
+            save_chunks_to_json(X_data, y_data, filename_incomplete+train+identifier+extension_filename)
+        elif identifier == "40_porciento":
+            save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
+            save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
+        else:
+            save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
+            save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
+            save_chunks_to_json(X_test, y_test, filename_incomplete+test+identifier+extension_filename)
+        
 
 
 
