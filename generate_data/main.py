@@ -141,7 +141,7 @@ def ejecutar():
     # Aquí entran los cambios.
     # -------------------
     
-    LIMITES = [("10_porciento", math.floor(.1*len(new_list))), ("40_porciento", math.floor(.4*len(new_list))), ("70_porciento", math.floor(.7*len(new_list))), ("90_porciento", math.floor(.9*len(new_list)))]
+    LIMITES = [("5_porciento", math.floor(.05*len(new_list))), ("10_porciento", math.floor(.1*len(new_list))), ("40_porciento", math.floor(.4*len(new_list))), ("70_porciento", math.floor(.7*len(new_list))), ("90_porciento", math.floor(.9*len(new_list)))]
     filename_incomplete: str = "dataset_"
     extension_filename: str = ".json"
     train: str = "train_"
@@ -184,25 +184,17 @@ def ejecutar():
         X_data = np.array(results_tables_x)
         X_data = np.expand_dims(X_data, axis=-1)
         
-        if identifier == "10_porciento":
+        if identifier == "10_porciento" or identifier == "5_porciento":
             X_train, X_tmp, y_train, y_tmp = train_test_split(X_data, y_data, test_size=.4, random_state = random_state)
             X_validation, X_test, y_validation, y_test = train_test_split(X_tmp, y_tmp, test_size=.2, random_state = random_state)
-        elif identifier == "40_porciento":
-            X_train, X_validation, y_train, y_validation = train_test_split(X_data, y_data, test_size=.2, random_state = random_state)
 
-        # Dividir entre train, validantion y test
-        if identifier == "90_porciento" or identifier == "70_porciento":
-            print("90-70 train: ", len(X_data))
+        if identifier == "90_porciento" or identifier == "70_porciento" or identifier == "40_porciento":
+            print("90-70-40 train: ", len(X_data))
             save_chunks_to_json(X_data, y_data, filename_incomplete+train+identifier+extension_filename)
-        elif identifier == "40_porciento":
-            print("40 train: ", len(X_train))
-            print("40 validation: ", len(X_validation))
-            save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
-            save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
         else:
-            print("10 train: ", len(X_train))
-            print("10 validation: ", len(X_validation))
-            print("10 test: ", len(X_test))
+            print("10-5 train: ", len(X_train))
+            print("10-5 validation: ", len(X_validation))
+            print("10-5 test: ", len(X_test))
             save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
             save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
             save_chunks_to_json(X_test, y_test, filename_incomplete+test+identifier+extension_filename)
