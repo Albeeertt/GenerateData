@@ -192,11 +192,17 @@ def ejecutar():
 
         # Dividir entre train, validantion y test
         if identifier == "90_porciento" or identifier == "70_porciento":
+            print("90-70 train: ", len(X_data))
             save_chunks_to_json(X_data, y_data, filename_incomplete+train+identifier+extension_filename)
         elif identifier == "40_porciento":
+            print("40 train: ", len(X_train))
+            print("40 validation: ", len(X_validation))
             save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
             save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
         else:
+            print("10 train: ", len(X_train))
+            print("10 validation: ", len(X_validation))
+            print("10 test: ", len(X_test))
             save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
             save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
             save_chunks_to_json(X_test, y_test, filename_incomplete+test+identifier+extension_filename)
