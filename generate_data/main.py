@@ -22,12 +22,12 @@ logging.basicConfig(
 )
 
 # work close
-from mi_herramienta.core.CleanData import CleanData
-from mi_herramienta.core.CreateTables import CreateTables
-from mi_herramienta.utils.scheduler import Scheduler
-from mi_herramienta.utils.wrapper import Wrapper
-from mi_herramienta.utils.split import split_into_chunks, split_list_into_tables
-from mi_herramienta.utils.agat import Agat
+from generate_data.core.CleanData import CleanData
+from generate_data.core.CreateTables import CreateTables
+from generate_data.utils.scheduler import Scheduler
+from generate_data.utils.wrapper import Wrapper
+from generate_data.utils.split import split_into_chunks, split_list_into_tables
+from generate_data.utils.agat import Agat
 
 
 def save_chunks_to_json(X_chunk, y_chunk, filename):
