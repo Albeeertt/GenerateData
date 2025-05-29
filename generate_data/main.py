@@ -57,7 +57,7 @@ def obtener_argumentos():
     parser.add_argument('--fasta', type=str, required=True, help="Ruta hasta el archivo fasta.")
     # parser.add_argument('--k', type=int, required=False, help="Tamaño del kmer.")
     parser.add_argument('--repeatMask', type=str, required=False, help="Mask of transposable elements in gff3.")
-    parser.add_argument('--add_labels', type="store_true", required=False, help="Add introns, intergenic regions and keep the longest isoform")
+    parser.add_argument('--add_labels', type=bool, required=False, help="Add introns, intergenic regions and keep the longest isoform")
     parser.add_argument('--n_cpus', type=int, required=True, help="Número de cpus a usar")
     parser.add_argument('--out', type=str, required=True, help="Carpeta donde se va a alojar row_w_high_KLDivergence")
     
