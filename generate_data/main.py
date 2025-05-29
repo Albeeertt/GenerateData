@@ -176,9 +176,9 @@ def ejecutar():
                     np.add(result_data_y, table_x, out=result_data_y)
 
             result_data_y = create_tables_instance.normalize_rows(result_data_y)
-            results_tables_y = [result_data_y for _ in range(len(results_tables_x))]
 
-            y_data = np.array(results_tables_y)
+        results_tables_y = [result_data_y for _ in range(len(results_tables_x))]
+        y_data = np.array(results_tables_y)
 
         
         X_data = np.array(results_tables_x)
