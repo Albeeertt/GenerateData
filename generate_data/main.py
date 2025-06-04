@@ -101,7 +101,7 @@ def ejecutar():
     
     cleanData_instance = CleanData()
     wrap_functions_instance = Wrapper()
-    create_tables_instance = CreateTables(default_value_k, translate_type_idx)
+    
     
     select_element_gff_fixed = partial(cleanData_instance.select_elements_gff, seleccionados)
 
@@ -136,7 +136,7 @@ def ejecutar():
     for selected in seleccionados:
         if selected not in tipos_bed:
             print("ERROR: No contiene ", selected)
-            sys.exit(0)
+            sys.exit(1)
     
     
     # -------------------------------------------------------------------------
@@ -154,7 +154,7 @@ def ejecutar():
     # Aquí entran los cambios.
     # -------------------
     
-    LIMITES = [("5_porciento", math.floor(.05*len(new_list))), ("10_porciento", math.floor(.1*len(new_list))), ("40_porciento", math.floor(.4*len(new_list))), ("70_porciento", math.floor(.7*len(new_list))), ("90_porciento", math.floor(.9*len(new_list)))]
+    LIMITES = [("5_porciento", math.floor(.05*len(new_list))), ("10_porciento", math.floor(.1*len(new_list)))]
     filename_incomplete: str = "dataset_"
     extension_filename: str = ".json"
     train: str = "train_"
@@ -163,55 +163,53 @@ def ejecutar():
 
     
     # LIMITE = DEFAULT_LIMITE if len(new_list) >= DEFAULT_LIMITE else len(new_list)
-    for idx, (identifier, LIMITE) in enumerate(LIMITES):
+    possible_k: List[int] = [5, 6, 7]
+    for new_k in possible_k:
+        create_tables_instance = CreateTables(new_k, translate_type_idx)
+        for idx, (identifier, LIMITE) in enumerate(LIMITES):
 
 
-        tables_fixed = partial(create_tables_instance.complete_table, limite = LIMITE, solapamiento = True)
+            tables_fixed = partial(create_tables_instance.complete_table, limite = LIMITE, solapamiento = True)
 
-        tables_adapter = wrap_functions_instance.make_adapter(
-            tables_fixed,
-            input_selector= wrap_functions_instance.tuple_chunk,
-            output_selector= wrap_functions_instance.output_res
-        )
+            tables_adapter = wrap_functions_instance.make_adapter(
+                tables_fixed,
+                input_selector= wrap_functions_instance.tuple_chunk,
+                output_selector= wrap_functions_instance.output_res
+            )
 
-        scheduler_cleanData = Scheduler([tables_adapter], split_list_into_tables)
-        result_data_x = scheduler_cleanData.run(new_list, LIMITE, n_cpu) # lista de tuplas
-        results_tables_x = []
-        for result, _ in result_data_x: results_tables_x.extend(result)
-        results_tables_x = [create_tables_instance.normalize_rows(table) for table in results_tables_x]
+            scheduler_cleanData = Scheduler([tables_adapter], split_list_into_tables)
+            result_data_x = scheduler_cleanData.run(new_list, LIMITE, n_cpu) # lista de tuplas
+            results_tables_x = []
+            for result, _ in result_data_x: results_tables_x.extend(result)
+            results_tables_x = [create_tables_instance.normalize_rows(table) for table in results_tables_x]
 
-        if idx == 0:
-            result_data_y = np.zeros_like(results_tables_x[0])
-            for tables_x, restante in result_data_x:
-                if restante is not None:
-                    np.add(result_data_y, restante, out=result_data_y)
-                for table_x in tables_x:
-                    np.add(result_data_y, table_x, out=result_data_y)
+            if idx == 0:
+                result_data_y = np.zeros_like(results_tables_x[0])
+                for tables_x, restante in result_data_x:
+                    if restante is not None:
+                        np.add(result_data_y, restante, out=result_data_y)
+                    for table_x in tables_x:
+                        np.add(result_data_y, table_x, out=result_data_y)
 
-            result_data_y = create_tables_instance.normalize_rows(result_data_y)
+                result_data_y = create_tables_instance.normalize_rows(result_data_y)
 
-        results_tables_y = [result_data_y for _ in range(len(results_tables_x))]
-        y_data = np.array(results_tables_y)
+            results_tables_y = [result_data_y for _ in range(len(results_tables_x))]
+            y_data = np.array(results_tables_y)
 
-        
-        X_data = np.array(results_tables_x)
-        X_data = np.expand_dims(X_data, axis=-1)
-        
-        if identifier == "10_porciento" or identifier == "5_porciento":
-            X_train, X_tmp, y_train, y_tmp = train_test_split(X_data, y_data, test_size=.4, random_state = random_state)
-            X_validation, X_test, y_validation, y_test = train_test_split(X_tmp, y_tmp, test_size=.2, random_state = random_state)
+            
+            X_data = np.array(results_tables_x)
+            X_data = np.expand_dims(X_data, axis=-1)
+            
+            X_train, X_tmp, y_train, y_tmp = train_test_split(X_data, y_data, test_size=.7, random_state = random_state)
+            X_validation, X_test, y_validation, y_test = train_test_split(X_tmp, y_tmp, test_size=.1, random_state = random_state)
 
-        if identifier == "90_porciento" or identifier == "70_porciento" or identifier == "40_porciento":
-            print("90-70-40 train: ", len(X_data))
-            save_chunks_to_json(X_data, y_data, filename_incomplete+train+identifier+extension_filename)
-        else:
             print("10-5 train: ", len(X_train))
             print("10-5 validation: ", len(X_validation))
             print("10-5 test: ", len(X_test))
-            save_chunks_to_json(X_train, y_train, filename_incomplete+train+identifier+extension_filename)
-            save_chunks_to_json(X_validation, y_validation, filename_incomplete+validation+identifier+extension_filename)
-            save_chunks_to_json(X_test, y_test, filename_incomplete+test+identifier+extension_filename)
-        
+            save_chunks_to_json(X_train, y_train, "kmer_"+str(new_k)+"/"filename_incomplete+train+identifier+extension_filename)
+            save_chunks_to_json(X_validation, y_validation, "kmer_"+str(new_k)+"/"filename_incomplete+validation+identifier+extension_filename)
+            save_chunks_to_json(X_test, y_test, "kmer_"+str(new_k)+"/"filename_incomplete+test+identifier+extension_filename)
+            
 
 
 
