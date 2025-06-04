@@ -21,6 +21,7 @@ class CleanData:
         all_bed : Dict[str,DataFrame] = {}
         data = pd.read_csv(route, comment='#', sep='\t', header=None, encoding= encoding)
         data.columns = ['chr','db','type','start','end','score','strand','phase','attributes']
+        data['type'] = data['type'].astype(str).str.upper()
         all_bed[1] = data
         return all_bed
     

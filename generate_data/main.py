@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 import math
 import json
 import base64
+import sys
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,8 +85,8 @@ def ejecutar():
 
     default_value_k: int = 7
     default_encoding: str = "latin-1"
-    seleccionados : List[str] = ['exon', 'intron', 'transposable_element', 'intergenic_region']
-    translate_type_idx : Dict[str, int] = {'exon': 0, 'intron': 1, 'transposable_element': 2, 'intergenic_region': 3}
+    seleccionados : List[str] = ['CDS', 'FIVE_PRIME_UTR', 'THREE_PRIME_UTR']
+    translate_type_idx : Dict[str, int] = {'CDS': 0, 'FIVE_PRIME_UTR': 1, 'THREE_PRIME_UTR': 2}
     DEFAULT_LIMITE: int = 800
 
     route_gff: str = args.gff
@@ -127,6 +128,18 @@ def ejecutar():
     scheduler_cleanData = Scheduler([select_adapter, extract_adapter, remove_sample_contaminated_adapter], split_into_chunks)
     fasta = cleanData_instance.obtain_dicc_fasta(route_fasta)
     bed = cleanData_instance.obtain_dicc_bed(route_gff, encoding=encoding_gff)
+    # -------------------------------------------------------------------------
+    # COMPROBACIÓN #
+    
+    single_bed = bed[1]
+    tipos_bed = set(single_bed['type'])
+    for selected in seleccionados:
+        if selected not in tipos_bed:
+            print("ERROR: No contiene ", selected)
+            sys.exit(0)
+    
+    
+    # -------------------------------------------------------------------------
     if args.repeatMask:
         bed = cleanData_instance.add_transposable_element(bed, args.repeatMask)
     results_clean_data = scheduler_cleanData.run(fasta, bed, n_cpu)
